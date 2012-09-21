@@ -1,0 +1,1 @@
+require "artirix_faker"

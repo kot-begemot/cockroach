@@ -1,3 +1,3 @@
 module ArtirixFaker
-  VERSION = "0.0.1"
+  VERSION = File.read(File.expand_path("./../../VERSION"))
 end
