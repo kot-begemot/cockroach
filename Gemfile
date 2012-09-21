@@ -12,6 +12,8 @@ group :test do
   gem "test-unit"
   gem 'shoulda-context'
 
+  gem "factory_girl"
+
   gem "simplecov", "~> 0.6.4", :platform => :ruby_19
   gem "rcov", "~> 1.0.0", :platform => :ruby_18
 

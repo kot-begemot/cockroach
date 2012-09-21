@@ -17,7 +17,6 @@ module ArtirixFaker
         end
       end
  
-
       context "and Correct config" do
         should "return array" do
           config = ArtirixFaker::Config::Loader.parse File.expand_path("../support/data/correct_without_option.yml", File.dirname(__FILE__))
