@@ -1,25 +1,19 @@
 # This file contains all the information, required for ArtirixFaker to
 # configure the amount of the generated records for fake database.
-# What it does, is just keep the amount of the records that is required to generate,
+# It just keep the amount of the records that is required to generate, hierarhy
 # and some other details conserning the generation way.
-# All the records should obey the next principals
-#
-#   <plural form of model>_<approach>
-#
-# Here are some examples:
-#
-#   To generate the exact amount of users
-#   users_amount: 100
-#
-#   To generate the random amount os the FeedEnitity's, with an average of 100 entities per
-#   Feed the following construction may be used(a normal distribution approach will be used):
-#   feed_ratio: 100
-#
-# For now there are only two aproaches: *amount* and *ratio*.
-#
 
-users_user: 1000
-businesses_amount: 1234
-feeds_amount: 100
-feeds_entities_ratio: 100
+# fixture_gem: :factory_girl
+# fixtures_path: test/fixtures
 
+user_amount: 1000
+
+feeds_ratio: 1000
+
+cities:
+  amount: 1000
+  places:
+    ratio:
+      lower_limit: 100
+      upper_limit: 1000
+    address_amount: 1

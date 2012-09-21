@@ -5,12 +5,8 @@ ActiveSupport.on_load(:after_initialize) do
 end
 
 module ArtirixFaker
-  autoload :VERSION, "artirix_faker/version"
+  extend ActiveSupport::Autoload
   
-  module Models
-    extend ActiveSupport::Autoload
-    
-    autoload :User
-  end
-
+  autoload :VERSION
+  autoload :Config
 end
