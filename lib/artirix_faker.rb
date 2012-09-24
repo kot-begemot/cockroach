@@ -9,4 +9,15 @@ module ArtirixFaker
   
   autoload :VERSION
   autoload :Config
+  
+  autoload_under 'fixtures' do
+    autoload :FactoryGirl
+  end
+
+  mattr_reader :config
+
+  def self.setup &block
+    block.yield(ArtirixFaker::Config)
+    @@config = ArtirixFaker::Config.new (ArtirixFaker::Config.config_path || "config/faker.yml")
+  end
 end

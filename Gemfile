@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
-gem "rails"
+gem "activerecord"
+gem "activesupport"
 gem "faker"
 
 group :development do
@@ -9,8 +10,10 @@ group :development do
 end
 
 group :test do
+  gem "rails"
   gem "test-unit"
   gem 'shoulda-context'
+  gem "mocha"
 
   gem "factory_girl"
 

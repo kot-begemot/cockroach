@@ -69,7 +69,7 @@ Or install it yourself as:
 
    Next way is *complicated subsequential*:
 
-     It if often needed to generate a subsequantial models, like in case when
+     It if often needed to generate a associated models, like in case when
      City'es may have many associated Place'es.
      A brief examples:
 
