@@ -19,5 +19,13 @@ module Cockroach
   def self.setup &block
     block.yield(Cockroach::Config)
     @@config = Cockroach::Config.new (Cockroach::Config.config_path || "config/faker.yml")
+    load_fixturer
+  end
+  
+  private
+
+  #
+  def self.load_fixturer
+    self.const_get(@@config.fixturer)
   end
 end

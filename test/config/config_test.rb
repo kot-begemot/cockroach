@@ -47,7 +47,7 @@ module Cockroach
         should "be default" do
           config = Cockroach::Config.new "../correct_with_option.yml"
 
-          assert_equal ::FactoryGirl, config.fixturer
+          assert_equal :FactoryGirl, config.fixturer
         end
       end
     end
@@ -90,7 +90,7 @@ module Cockroach
 
         config = Cockroach.config
 
-        assert_equal FactoryBoy, config.fixturer
+        assert_equal :FactoryBoy, config.fixturer
         Object.__send__(:remove_const,'FactoryBoy')
       end
     end

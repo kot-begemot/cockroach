@@ -33,7 +33,7 @@ module Cockroach
     end
 
     def fixturer
-      @fixturer ||= "::#{@fixturer_def.to_s.camelize}".constantize
+      @fixturer ||= @fixturer_def.to_s.camelize.to_sym
     end
 
     protected
