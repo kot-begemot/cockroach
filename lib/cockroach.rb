@@ -1,10 +1,10 @@
 require 'active_support'
 
 ActiveSupport.on_load(:after_initialize) do
-  require "artirix_faker/railtie"
+  require "cockroach/railtie"
 end
 
-module ArtirixFaker
+module Cockroach
   extend ActiveSupport::Autoload
   
   autoload :VERSION
@@ -17,7 +17,7 @@ module ArtirixFaker
   mattr_reader :config
 
   def self.setup &block
-    block.yield(ArtirixFaker::Config)
-    @@config = ArtirixFaker::Config.new (ArtirixFaker::Config.config_path || "config/faker.yml")
+    block.yield(Cockroach::Config)
+    @@config = Cockroach::Config.new (Cockroach::Config.config_path || "config/faker.yml")
   end
 end

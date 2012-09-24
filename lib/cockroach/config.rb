@@ -1,9 +1,9 @@
-module ArtirixFaker
+module Cockroach
   class Config
     extend ActiveSupport::Autoload
     
     autoload :Loader
-    autoload :ConfigNotExistsError, 'artirix_faker/config/loader'
+    autoload :ConfigNotExistsError, 'cockroach/config/loader'
 
     class MissingRootPathError < Exception; end
 
@@ -28,7 +28,7 @@ module ArtirixFaker
     
     def initialize path_to_config
       @config_path = File.expand_path path_to_config, self.class.root
-      @profile, @options = ArtirixFaker::Config::Loader.parse(@config_path)
+      @profile, @options = Cockroach::Config::Loader.parse(@config_path)
       @fixturer_def = get_option('fixturer') || self.class.fixturer || 'factory_girl'
     end
 

@@ -11,7 +11,7 @@ ENV["RAILS_ENV"] = "test"
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH << File.join(File.dirname(__FILE__), 'support', 'models')
-require 'artirix-faker'
+require 'cockroach'
 
 require "rails/test_help"
 require "rails/generators/test_case"

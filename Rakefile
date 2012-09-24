@@ -12,7 +12,7 @@ require 'rake'
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name = "artirix-faker"
+  gem.name = "cockroach"
   gem.homepage = "http://google.it"
   gem.license = "MIT"
   gem.summary = %Q{This gem allows one to fake all the date for the Artirix project}

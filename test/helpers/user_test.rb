@@ -2,7 +2,7 @@ require "test_helper"
 require "user"
 require "user_factory"
 
-module ArtirixFaker
+module Cockroach
   class UserTest < Test::Unit::TestCase
     context "User" do
       def setup

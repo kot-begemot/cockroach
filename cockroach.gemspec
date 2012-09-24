@@ -4,7 +4,7 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = "artirix-faker"
+  s.name = "cockroach"
   s.version = "0.0.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
@@ -22,9 +22,9 @@ Gem::Specification.new do |s|
     "README.md",
     "Rakefile",
     "VERSION",
-    "artirix_faker.gemspec",
-    "lib/artirix_faker.rb",
-    "lib/artirix_faker/version.rb"
+    "cockroach.gemspec",
+    "lib/cockroach.rb",
+    "lib/cockroach/version.rb"
   ]
   s.homepage = "http://google.it"
   s.licenses = ["MIT"]

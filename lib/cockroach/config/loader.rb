@@ -1,7 +1,7 @@
 require "psych"
 require "yaml"
 
-module ArtirixFaker
+module Cockroach
   class Config
     # Loader class just returns a structured and ready to use information
     # parsed from faker project yaml file.

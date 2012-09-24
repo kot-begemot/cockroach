@@ -1,4 +1,4 @@
-# ArtirixFaker
+# Cockroach
 
 TODO: Write a gem description
 
@@ -6,7 +6,7 @@ TODO: Write a gem description
 
 Add this line to your application's Gemfile:
 
-    gem 'artirix_faker'
+    gem 'cockroach'
 
 And then execute:
 
@@ -14,7 +14,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install artirix_faker
+    $ gem install cockroach
 
 ## Usage
 

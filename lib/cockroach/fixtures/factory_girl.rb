@@ -1,7 +1,7 @@
 require "factory_girl"
-require "artirix_faker/fixtures/factory_girl/loader"
+require "cockroach/fixtures/factory_girl/loader"
 
-module ArtirixFaker
+module Cockroach
   # FactoryGirl module keeps the internal organization of the routine, happening
   # during the FactoryGirl fixtures initialization and handling process.
   module FactoryGirl

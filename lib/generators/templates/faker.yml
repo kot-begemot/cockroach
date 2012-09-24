@@ -1,4 +1,4 @@
-# This file contains all the information, required for ArtirixFaker to
+# This file contains all the information, required for Cockroach to
 # configure the amount of the generated records for fake database.
 # It just keep the amount of the records that is required to generate, hierarhy
 # and some other details conserning the generation way.

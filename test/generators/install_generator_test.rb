@@ -2,7 +2,7 @@ require "test_helper"
 require "generators/install_generator"
 
 class InstallGeneratorTest < Rails::Generators::TestCase
-  tests ArtirixFaker::Generators::InstallGenerator
+  tests Cockroach::Generators::InstallGenerator
   destination File.expand_path("../../../tmp", __FILE__)
   setup :prepare_destination
 
