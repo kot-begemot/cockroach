@@ -18,8 +18,9 @@ require "rails/generators/test_case"
 
 require File.expand_path("support/active_record", File.dirname(__FILE__))
 require File.expand_path("support/database_cleaner", File.dirname(__FILE__))
+require File.expand_path("support/factory_girl_mocked", File.dirname(__FILE__))
 
 class Test::Unit::TestCase
   include OrmSetup
+  include ::FactoryGirl::Mock
 end
-

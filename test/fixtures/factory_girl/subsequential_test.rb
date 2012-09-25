@@ -1,9 +1,8 @@
 require "test_helper"
-require "factory_girl"
 require "user"
 
 module Cockroach
-  class FactoryGirlLoadingTest < Test::Unit::TestCase
+  class FactoryGirlSubsequntialTest < Test::Unit::TestCase
     context "Subsequential profiler" do
     end
   end

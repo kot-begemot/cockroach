@@ -1,5 +1,4 @@
 require "test_helper"
-require "factory_girl"
 
 module Cockroach
   class ConfigTest < Test::Unit::TestCase

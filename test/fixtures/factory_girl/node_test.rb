@@ -1,15 +1,12 @@
 require "test_helper"
-require "factory_girl"
 require "user"
 
 module Cockroach
-  class FactoryGirlLoadingTest < Test::Unit::TestCase
+  class FactoryGirlNodeTest < Test::Unit::TestCase
     context "Node" do
       def setup
         before_setup
-
-        ::FactoryGirl.stubs(:factory_by_name).with("users").returns(true)
-        ::FactoryGirl.stubs(:factory_by_name).with("test").raises(ArgumentError.new("Factory not registered: test"))
+        mock_factory_girl
       end
 
       def teardown
