@@ -57,13 +57,8 @@ module Cockroach
         after_initialize
       end
 
-      #
+      # Just in case Fixturer requires anything to be done after the node initialization
       def after_initialize
-      end
-
-      # This method will load all the mentioned records into the database
-      def load!
-        raise "Abstract method"
       end
 
       # Keeps the number, that represents the amount of the records that will

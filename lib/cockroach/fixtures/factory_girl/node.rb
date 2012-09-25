@@ -9,7 +9,10 @@ module Cockroach
       end
 
       def load!
-        ::FactoryGirl
+        amount.times do
+          ::FactoryGirl.create(name.singularize)
+          load_nodes!
+        end
       end
     end
   end

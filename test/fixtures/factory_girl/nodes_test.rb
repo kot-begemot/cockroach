@@ -26,6 +26,25 @@ module Cockroach
           assert_equal 'amount', subnode.approach
           assert_equal 10, subnode.amount
         end
+
+        should "recive .load! call from supnode" do
+          users_node = Cockroach::FactoryGirl::Node.new('users' => {'amount' => '100', 'places_amount' => '10'})
+
+          subnode = users_node.nodes[0]
+          
+          subnode.expects(:load!)
+
+          users_node.__send__(:load_nodes!)
+        end
+
+        should "initiate records excat times" do
+          users_node = Cockroach::FactoryGirl::Node.new('users' => {'amount' => '10', 'places_amount' => '10'})
+
+          ::FactoryGirl.expects("create").with("user").times(10)
+          ::FactoryGirl.expects("create").with("place").times(100)
+
+          users_node.__send__(:load!)
+        end
       end
     end
   end
