@@ -2,7 +2,7 @@ require "test_helper"
 require "user"
 
 module Cockroach
-  class FactoryGirlSimpleTest < Test::Unit::TestCase
+  class FactoryGirlProfilerTest < Test::Unit::TestCase
     context "Simple profiler" do
       def setup
         Cockroach.setup do |c|

@@ -37,6 +37,15 @@ module Cockroach
       
       context "Name definition" do
         context "Info extracting" do
+          should "get options" do
+            structure = { "users" => { 'amount' => '100', 'places_amount' => '10' }}
+
+            user_node = Cockroach::FactoryGirl::Node.new structure
+
+            assert_equal({'amount' => '100'}, user_node.instance_variable_get(:@options))
+            assert_equal({'places_amount' => '10'}, user_node.instance_variable_get(:@structure))
+          end
+
           should "get user name without approach" do
             assert_equal ["users",nil], Cockroach::FactoryGirl::Node.extract_info("users")
           end

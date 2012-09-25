@@ -4,6 +4,7 @@ module Cockroach
     # fixtures are created specific amount of time and will make sure that
     # the associations are correctly assigned.
     class Node
+      include Cockroach::Base::LoadNodes
       
       APPROACHES = %w(amount ratio).freeze
 
@@ -13,7 +14,8 @@ module Cockroach
         # with one key only.
         # In any other case a _false_ value will be returned
         def valid_structure? structure
-          structure.is_a?(Hash) && structure.keys.size == 1
+          structure.is_a?(Hash) && structure.keys.size == 1 ||
+            structure.is_a?(Array) && structure.size == 2
         end
 
         # Deduct the information from Node instance name:
@@ -37,20 +39,30 @@ module Cockroach
         end
       end
 
-      attr_reader :name, :approach, :factory # :amount
+      attr_reader :name, :approach, :nodes # :amount
 
       def initialize structure
         raise InvalideStructureError.new("Node has faced invalid structure") unless self.class.valid_structure?(structure)
         @node_key, @structure = structure.flatten
         @name, @approach = self.class.extract_info(@node_key.dup)
-        @approach.blank? ? complicated_approch : simple_approach
+        if @approach.blank?
+          extract_options
+          complicated_approch
+          load_nodes
+        else
+          simple_approach
+        end
         raise InvalideStructureError.new("Approch was not specified") if @approach.blank?
         raise MissingFixtureError.new("Approch was not specified") if @approach.blank?
-        @factory = ::FactoryGirl.factory_by_name(@name)
+        after_initialize
+      end
+
+      #
+      def after_initialize
       end
 
       # This method will load all the mentioned records into the database
-      def load
+      def load!
         raise "Abstract method"
       end
 
@@ -62,16 +74,20 @@ module Cockroach
 
       protected
 
+      def extract_options
+        @options = @structure.extract!(*APPROACHES).delete_if {|k,v| v.nil?}
+      end
+
       def complicated_approch
-        approach = @structure.select { |k,v| APPROACHES.include? k }
+        approach = @options.select { |k,v| APPROACHES.include? k }
         raise InvalideStructureError.new("Amount is not specified or specified multiple times") unless approach.keys.size == 1
         case (@approach = approach.keys[0])
         when "amount"
-          @amount = @structure[@approach].to_i
+          @amount = @options[@approach].to_i
         when "ratio"
-          @structure[@approach].is_a?(String) ?
-            set_simple_limits(@structure[@approach].to_i) :
-            extract_limits(@structure[@approach])
+          @options[@approach].is_a?(String) ?
+            set_simple_limits(@options[@approach].to_i) :
+            extract_limits(@options[@approach])
         end
       end
 

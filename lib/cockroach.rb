@@ -12,6 +12,7 @@ module Cockroach
 
   module Base
     autoload :Node, 'cockroach/base/node'
+    autoload :LoadNodes, 'cockroach/base/load_nodes'
   end
   
   autoload_under 'fixtures' do
