@@ -9,10 +9,17 @@ module Cockroach
   
   autoload :VERSION
   autoload :Config
+
+  module Base
+    autoload :Node, 'cockroach/base/node'
+  end
   
   autoload_under 'fixtures' do
     autoload :FactoryGirl
   end
+
+  class InvalideStructureError < Exception; end
+  class MissingFixtureError < Exception; end
 
   mattr_reader :config
 
