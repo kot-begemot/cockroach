@@ -8,11 +8,16 @@ module Cockroach
       included do
         attr_reader :nodes
 
-        def load!
+        def load! *agrs
           raise "Abstract method"
         end
 
         protected
+
+        # Compose data structure, that will be provided to sub fixtures
+        def prepare_fixturer_opts
+          raise "Abstract method"
+        end
 
         # Parse structure file and create a branch of sub nodes.
         def load_nodes
@@ -22,10 +27,10 @@ module Cockroach
         end
 
         # Load all the sub nodes
-        def load_nodes!
+        def load_nodes! fixturer_opts = nil
           @nodes.each do |node|
-            node.load!
-          end if @nodes
+            node.load! fixturer_opts
+          end
         end
       end
     end

@@ -39,7 +39,7 @@ module Cockroach
         end
       end
 
-      attr_reader :name, :approach, :nodes # :amount
+      attr_reader :name, :approach # :amount
 
       def initialize structure
         raise InvalideStructureError.new("Node has faced invalid structure") unless self.class.valid_structure?(structure)
@@ -63,16 +63,17 @@ module Cockroach
 
       # Keeps the number, that represents the amount of the records that will
       # created for this node.
+      # This will be the final number of the records that are going to be created.
+      # In case there was a ratio specified, that method will randomly get a
+      # number within the provided range and keep it.
       def amount
         @amount ||= get_random_amount
       end
 
       protected
 
-      def extract_options
-        @options = @structure.extract!(*APPROACHES).delete_if {|k,v| v.nil?}
-      end
-
+      # Complicated approach is used, once the amount directives were specified
+      # within node subconfig.
       def complicated_approch
         approach = @options.select { |k,v| APPROACHES.include? k }
         raise InvalideStructureError.new("Amount is not specified or specified multiple times") unless approach.keys.size == 1
@@ -86,7 +87,9 @@ module Cockroach
         end
       end
 
-      # DEf
+      # Simple approach is used when the amount of the records is specified as the
+      # Yaml node content, and the way this number should be treated as a node
+      # suffix 
       def simple_approach
         case @approach
         when "amount"
@@ -94,6 +97,12 @@ module Cockroach
         when "ratio"
           set_simple_limits @structure.to_i
         end
+      end
+
+      # Clear the node subconfig. Will extract all the options or directives from
+      # provided Hash, and assigne the to the corresponding variables.
+      def extract_options
+        @options = @structure.extract!(*APPROACHES).delete_if {|k,v| v.nil?}
       end
 
       # Defines a simple limits for random amount. It is as simple as

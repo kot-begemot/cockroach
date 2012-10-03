@@ -12,6 +12,14 @@ module FactoryGirl
   end
   
   module Mock
+    def sequence_number_for(factory)
+      if (@sequences ||= {})[factory].nil?
+        @sequences[factory] ||= 0
+      else
+        @sequences[factory] += 1
+      end
+    end
+
     def mock_factory_girl
       ::FactoryGirl.stubs(:factories)
       ::FactoryGirl.stubs(:find_definitions)

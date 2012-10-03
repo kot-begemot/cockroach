@@ -8,10 +8,15 @@ module Cockroach
         @factory = ::FactoryGirl.factory_by_name(@name)
       end
 
-      def load!
+      def load! factory_opts = nil
         amount.times do
-          ::FactoryGirl.create(name.singularize)
-          load_nodes!
+          factory_name = name.singularize
+          current_factory = factory_opts ?
+            ::FactoryGirl.create(factory_name, factory_opts) :
+            ::FactoryGirl.create(factory_name)
+          unless nodes.blank?
+            load_nodes! (factory_opts || {}).merge({ factory_name => current_factory})
+          end
         end
       end
     end

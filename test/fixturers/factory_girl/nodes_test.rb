@@ -4,23 +4,22 @@ require "user"
 module Cockroach
   class FactoryGirlNodesTest < Test::Unit::TestCase
     context "Nodes" do
-      def setup
-        before_setup
-        mock_factory_girl
-      end
-
-      def teardown
-        after_teardown
-      end
-
       context "Subnodes" do
-        should "create subnode" do
-          users_node = Cockroach::FactoryGirl::Node.new('users' => {'amount' => '100', 'places_amount' => '10'})
-          
-          assert_equal 1, users_node.nodes.size
-          
-          subnode = users_node.nodes[0]
+        def setup
+          before_setup
+          mock_factory_girl
+          @users_node = Cockroach::FactoryGirl::Node.new('users' => {'amount' => '5', 'places_amount' => '10'})
+        end
 
+        def teardown
+          after_teardown
+        end
+        
+        should "create subnode" do
+          assert_equal 1, @users_node.nodes.size
+          
+          subnode = @users_node.nodes[0]
+          
           assert_instance_of Cockroach::FactoryGirl::Node, subnode
           assert_equal 'places', subnode.name
           assert_equal 'amount', subnode.approach
@@ -28,22 +27,48 @@ module Cockroach
         end
 
         should "recive .load! call from supnode" do
-          users_node = Cockroach::FactoryGirl::Node.new('users' => {'amount' => '100', 'places_amount' => '10'})
-
-          subnode = users_node.nodes[0]
-          
+          subnode = @users_node.nodes[0]
           subnode.expects(:load!)
 
-          users_node.__send__(:load_nodes!)
+          @users_node.__send__(:load_nodes!)
         end
+        
+        context "Heritage" do
+          should "send load! call to subnodes" do
+            ::FactoryGirl.stubs("create").with("user").returns( *((1..10).to_a.collect {|i| "user#{i}"}) )
+            ::FactoryGirl.stubs("create").with("place", any_parameters).returns(true)
 
-        should "initiate records excat times" do
-          users_node = Cockroach::FactoryGirl::Node.new('users' => {'amount' => '10', 'places_amount' => '10'})
+            subnode = @users_node.nodes[0]
+            subnode.expects(:load!).with({"user" => "user1"})
+            subnode.expects(:load!).with({"user" => "user2"})
+            subnode.expects(:load!).with({"user" => "user3"})
+            subnode.expects(:load!).with({"user" => "user4"})
+            subnode.expects(:load!).with({"user" => "user5"})
 
-          ::FactoryGirl.expects("create").with("user").times(10)
-          ::FactoryGirl.expects("create").with("place").times(100)
+            @users_node.__send__(:load!)
+          end
 
-          users_node.__send__(:load!)
+          should "initiate parrent record exact times" do
+            ::FactoryGirl.stubs("create").with(any_parameters).returns(true)
+            ::FactoryGirl.stubs("create").with("user").returns( *((1..10).to_a.collect {|i| "user#{i}"}) )
+            
+            ::FactoryGirl.expects(:create).with("user").times(5)
+
+            @users_node.__send__(:load!)
+          end
+
+          should "initiate child records exact times" do
+            ::FactoryGirl.stubs("create").with(any_parameters).returns(true)
+            ::FactoryGirl.stubs("create").with("user").returns( *((1..10).to_a.collect {|i| "user#{i}"}) )
+
+            ::FactoryGirl.expects(:create).with("place", {"user" => "user1"}).times(10)
+            ::FactoryGirl.expects(:create).with("place", {"user" => "user2"}).times(10)
+            ::FactoryGirl.expects(:create).with("place", {"user" => "user3"}).times(10)
+            ::FactoryGirl.expects(:create).with("place", {"user" => "user4"}).times(10)
+            ::FactoryGirl.expects(:create).with("place", {"user" => "user5"}).times(10)
+
+            @users_node.__send__(:load!)
+          end
         end
       end
     end
