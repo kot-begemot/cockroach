@@ -35,6 +35,30 @@ module Cockroach
         end
       end
       
+      context "Initialization" do
+        should "should accept hash" do
+          user_node = nil
+          
+          assert_nothing_thrown do
+            user_node = Cockroach::FactoryGirl::Node.new({ "users" => { 'amount' => '100', 'places_amount' => '10' }})
+          end 
+          
+          assert_equal({'amount' => '100'}, user_node.instance_variable_get(:@options))
+          assert_equal({'places_amount' => '10'}, user_node.instance_variable_get(:@structure))
+        end
+
+        should "should accept params" do
+          user_node = nil
+          
+          assert_nothing_thrown do
+            user_node = Cockroach::FactoryGirl::Node.new "users", { 'amount' => '100', 'places_amount' => '10' }
+          end
+
+          assert_equal({'amount' => '100'}, user_node.instance_variable_get(:@options))
+          assert_equal({'places_amount' => '10'}, user_node.instance_variable_get(:@structure))
+        end
+      end
+      
       context "Name definition" do
         context "Info extracting" do
           should "get options" do

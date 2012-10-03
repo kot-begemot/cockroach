@@ -41,7 +41,8 @@ module Cockroach
 
       attr_reader :name, :approach # :amount
 
-      def initialize structure
+      def initialize *opts
+        structure = opts.size == 1 ? opts[0] : opts
         raise InvalideStructureError.new("Node has faced invalid structure") unless self.class.valid_structure?(structure)
         @node_key, @structure = structure.flatten
         @name, @approach = self.class.extract_info(@node_key.dup)
