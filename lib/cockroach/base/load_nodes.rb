@@ -14,11 +14,6 @@ module Cockroach
 
         protected
 
-        # Compose data structure, that will be provided to sub fixtures
-        def prepare_fixturer_opts
-          raise "Abstract method"
-        end
-
         # Parse structure file and create a branch of sub nodes.
         def load_nodes
           @structure.each do |node_structure|

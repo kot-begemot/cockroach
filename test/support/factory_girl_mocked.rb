@@ -25,6 +25,7 @@ module FactoryGirl
       ::FactoryGirl.stubs(:find_definitions)
       ::FactoryGirl.stubs(:factory_by_name).with("users").returns(true)
       ::FactoryGirl.stubs(:factory_by_name).with("places").returns(true)
+      ::FactoryGirl.stubs(:factory_by_name).with("birds").returns(true)
       ::FactoryGirl.stubs(:factory_by_name).with("test").raises(ArgumentError.new("Factory not registered: test"))
     end
   end

@@ -9,13 +9,17 @@ module Cockroach
       end
 
       def load! factory_opts = nil
+        if factory_opts
+          normalised_opts = factory_opts.dup
+          @aliases.each_pair { |k,v| normalised_opts[k] = normalised_opts.delete(v) } if @aliases
+        end
         amount.times do
           factory_name = name.singularize
-          current_factory = factory_opts ?
-            ::FactoryGirl.create(factory_name, factory_opts) :
+          current_factory = factory_opts ? 
+            ::FactoryGirl.create(factory_name, normalised_opts) :
             ::FactoryGirl.create(factory_name)
           unless nodes.blank?
-            load_nodes! (factory_opts || {}).merge({ factory_name => current_factory})
+            load_nodes! (factory_opts || {}).merge({ (@alias_as || factory_name) => current_factory})
           end
         end
       end
