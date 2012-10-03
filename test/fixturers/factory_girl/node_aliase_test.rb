@@ -40,7 +40,7 @@ module Cockroach
           ::FactoryGirl.expects(:create).with("place", {"person" => "user2"}).times(10)
           ::FactoryGirl.expects(:create).with("place", {"person" => "user3"}).times(10)
           ::FactoryGirl.expects(:create).with("place", {"person" => "user4"}).times(10)
-          ::FactoryGirl.expects(:create).with("place", {"owner" => "user5"}).times(10)
+          ::FactoryGirl.expects(:create).with("place", {"person" => "user5"}).times(10)
 
           @users_node.__send__(:load!)
         end

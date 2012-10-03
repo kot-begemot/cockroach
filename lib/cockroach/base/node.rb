@@ -104,8 +104,7 @@ module Cockroach
       def extract_options
         @options = @structure.extract!(*APPROACHES).delete_if {|k,v| v.nil?}
         @alias_as = @structure.delete("as")
-        @aliases = {}
-        @structure.each_pair {| key, value | @aliases[$1] = value if key =~ /^(.*)_as$/ }
+        @structure.each_pair {| key, value | (@aliases ||= {})[$1] = value if key =~ /^(.*)_as$/ }
         @structure.delete_if {| key, value | key =~ /_as$/ }
       end
 
