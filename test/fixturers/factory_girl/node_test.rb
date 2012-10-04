@@ -178,7 +178,6 @@ module Cockroach
       context "Heritage" do
         should "send load! call to subnodes" do
           ::FactoryGirl.stubs("create").with("user").returns( *((1..10).to_a.collect {|i| "user#{i}"}) )
-          ::FactoryGirl.stubs("create").with("place", any_parameters).returns(true)
 
           subnode = @users_node.nodes[0]
           subnode.expects(:load!).with({"user" => "user1"})
@@ -191,16 +190,15 @@ module Cockroach
         end
 
         should "initiate parrent record exact times" do
-          ::FactoryGirl.stubs("create").with(any_parameters).returns(true)
-          ::FactoryGirl.stubs("create").with("user").returns( *((1..10).to_a.collect {|i| "user#{i}"}) )
+          ::FactoryGirl.expects(:create).with("user").times(5).returns( *((1..10).to_a.collect {|i| "user#{i}"}) )
+          ::FactoryGirl.stubs(:create).with("place", any_parameters)
 
-          ::FactoryGirl.expects(:create).with("user").times(5)
+          @users_node.nodes.each {|node| node.stubs(:allowed_options).returns(['user']) }
 
           @users_node.__send__(:load!)
         end
 
         should "initiate child records exact times" do
-          ::FactoryGirl.stubs("create").with(any_parameters).returns(true)
           ::FactoryGirl.stubs("create").with("user").returns( *((1..10).to_a.collect {|i| "user#{i}"}) )
 
           ::FactoryGirl.expects(:create).with("place", {"user" => "user1"}).times(10)
@@ -208,6 +206,8 @@ module Cockroach
           ::FactoryGirl.expects(:create).with("place", {"user" => "user3"}).times(10)
           ::FactoryGirl.expects(:create).with("place", {"user" => "user4"}).times(10)
           ::FactoryGirl.expects(:create).with("place", {"user" => "user5"}).times(10)
+
+          @users_node.nodes.each {|node| node.stubs(:allowed_options).returns(['user']) }
 
           @users_node.__send__(:load!)
         end

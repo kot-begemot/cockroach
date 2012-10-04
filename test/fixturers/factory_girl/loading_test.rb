@@ -21,8 +21,6 @@ module Cockroach
       should "register fixtures" do
         ::FactoryGirl.expects(:find_definitions)
 
-        debugger
-
         Cockroach::FactoryGirl::Loader.load
       end
     end

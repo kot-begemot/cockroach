@@ -4,7 +4,7 @@ require "user"
 module Cockroach
   class FactoryGirlProfilerTest < Test::Unit::TestCase
     context "Simple profiler" do
-      def setup
+      setup do
         before_setup
         mock_factory_girl
         Cockroach.setup do |c|
@@ -13,7 +13,7 @@ module Cockroach
         end
       end
 
-      def teardown
+      teardown do
         after_teardown
       end
 
