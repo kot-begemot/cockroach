@@ -10,7 +10,7 @@ module FactoryGirl
 
   def self.define
   end
-  
+
   module Mock
     def sequence_number_for(factory)
       if (@sequences ||= {})[factory].nil?

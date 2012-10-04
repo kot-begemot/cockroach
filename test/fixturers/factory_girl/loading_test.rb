@@ -7,7 +7,7 @@ module Cockroach
       def setup
         mock_factory_girl
         @old = Cockroach::Config.dup
-
+        
         Cockroach.setup do |c|
           c.root = File.expand_path("../../../support/data/dummy_structure", __FILE__)
           c.config_path = "./config/user_only.yml"
@@ -20,6 +20,9 @@ module Cockroach
 
       should "register fixtures" do
         ::FactoryGirl.expects(:find_definitions)
+
+        debugger
+
         Cockroach::FactoryGirl::Loader.load
       end
     end

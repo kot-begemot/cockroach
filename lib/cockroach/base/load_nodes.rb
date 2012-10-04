@@ -12,6 +12,10 @@ module Cockroach
           raise "Abstract method"
         end
 
+        def nodes
+          @nodes ||= []
+        end
+
         protected
 
         # Parse structure file and create a branch of sub nodes.
