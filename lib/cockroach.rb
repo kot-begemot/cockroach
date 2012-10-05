@@ -1,8 +1,5 @@
 require 'active_support'
-
-ActiveSupport.on_load(:after_initialize) do
-  require "cockroach/railtie"
-end
+require "cockroach/railtie" if defined?(Rails)
 
 module Cockroach
   extend ActiveSupport::Autoload

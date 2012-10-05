@@ -16,7 +16,7 @@ module Cockroach
       def root
         @root ||= begin
           if defined?(Rails)
-            Rails.root
+            File.join Rails.root
           else
             "./"
           end

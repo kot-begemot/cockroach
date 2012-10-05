@@ -13,7 +13,7 @@ module Cockroach
       class << self
         # Load the file from the provided path, and return the contents as
         # an Array, with the following structure:
-        #   
+        #
         #   [
         #     { * Hash containg the amounts },
         #     { * Hash containing any other options or settings }

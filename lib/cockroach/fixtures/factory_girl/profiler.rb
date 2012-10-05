@@ -12,6 +12,7 @@ module Cockroach
       # This method will load all the mentioned records into database
       def load
         unless @loaded
+          Cockroach::FactoryGirl::Loader.load
           @source.each_pair do |name, structure|
             (@nodes ||= []) << Cockroach::FactoryGirl::Node.new(name, structure)
           end
