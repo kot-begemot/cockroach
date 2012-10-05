@@ -20,8 +20,8 @@ module Cockroach
 
         # Parse structure file and create a branch of sub nodes.
         def load_nodes
-          @structure.each do |node_structure|
-            (@nodes ||= []) << Cockroach::FactoryGirl::Node.new(node_structure)
+          @structure.each do |name, structure|
+            (@nodes ||= []) << Cockroach::FactoryGirl::Node.new(name, structure)
           end
         end
 

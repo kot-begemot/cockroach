@@ -82,7 +82,7 @@ module Cockroach
         when "amount"
           @amount = @options[@approach].to_i
         when "ratio"
-          @options[@approach].is_a?(String) ?
+          @options[@approach].is_a?(String) || @options[@approach].kind_of?(Numeric) ?
             set_simple_limits(@options[@approach].to_i) :
             extract_limits(@options[@approach])
         end

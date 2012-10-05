@@ -16,9 +16,9 @@ module Cockroach
           @aliases.each_pair { |k,v| normalised_opts[k] = normalised_opts.delete(v) } if @aliases
           normalised_opts.keep_if {|k,v| allowed_options.include? k }
         end
-        
+
         amount.times do
-          current_factory = normalised_opts ?
+          current_factory = !normalised_opts.blank? ?
             ::FactoryGirl.create(factory_name, normalised_opts) :
             ::FactoryGirl.create(factory_name)
           unless nodes.blank?
@@ -30,7 +30,7 @@ module Cockroach
       protected
 
       def allowed_options
-        @allowed_options ||= @factory.send(:evaluator_class).attribute_list.names
+        @allowed_options ||= @factory.send(:evaluator_class).attribute_list.names.map(&:to_s)
       end
     end
   end

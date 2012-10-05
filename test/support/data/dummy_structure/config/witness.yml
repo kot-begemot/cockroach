@@ -1,0 +1,6 @@
+witness:
+  amount: 6
+  message:
+    ratio: 3
+    author_as: witness
+    
