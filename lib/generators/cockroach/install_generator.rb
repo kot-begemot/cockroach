@@ -11,6 +11,10 @@ module Cockroach
       def copy_config
         template "faker.yml", "config/faker.yml"
       end
+
+      def copy_initializer
+        template "cockroach.rb", "config/initializers/cockroach.rb"
+      end
     end
   end
 end

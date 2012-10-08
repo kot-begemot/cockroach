@@ -9,5 +9,6 @@ class InstallGeneratorTest < Rails::Generators::TestCase
   test "Assert all files are properly created" do
     run_generator
     assert_file "config/faker.yml"
+    assert_file "config/initializers/cockroach.rb"
   end
 end
