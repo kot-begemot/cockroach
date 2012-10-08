@@ -133,6 +133,13 @@ module Cockroach
           assert users_node.amount.is_a?(Integer)
         end
 
+        should "simple relation is not persistent" do
+          users_node = Cockroach::FactoryGirl::Node.new('users_ratio' => '100')
+          users_node.stubs(:get_limits).returns([50, 200])
+          
+          assert_not_equal users_node.amount, users_node.amount
+        end
+
         should "subsequent amount" do
           users_node = Cockroach::FactoryGirl::Node.new('users' => {'amount' => '100'})
           assert_equal 100, users_node.amount

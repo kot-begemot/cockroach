@@ -68,7 +68,7 @@ module Cockroach
       # In case there was a ratio specified, that method will randomly get a
       # number within the provided range and keep it.
       def amount
-        @amount ||= get_random_amount
+        @amount || get_random_amount
       end
 
       protected
