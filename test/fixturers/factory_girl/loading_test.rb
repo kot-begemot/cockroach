@@ -4,7 +4,7 @@ require "user"
 module Cockroach
   class FactoryGirlLoadingTest < Test::Unit::TestCase
     context "Fixture loading" do
-      def setup
+      setup do
         mock_factory_girl
         @old = Cockroach::Config.dup
         
@@ -14,7 +14,7 @@ module Cockroach
         end
       end
 
-      def teardown        
+      teardown do
         silence_warnings { Cockroach.const_set('Config', @old) }
       end
 
@@ -22,6 +22,22 @@ module Cockroach
         ::FactoryGirl.expects(:find_definitions)
 
         Cockroach::FactoryGirl::Loader.load
+      end
+
+      context "Factories path is different" do
+        setup do
+          Cockroach.config.instance_variable_set(:@fixtures_path, "/path/to/fixtures")
+        end
+
+        teardown do
+          Cockroach.config.instance_variable_set(:@fixtures_path, nil)
+        end
+        should "register fixtures" do
+          ::FactoryGirl.expects(:definition_file_paths=).with(["/path/to/fixtures"])
+          ::FactoryGirl.expects(:definition_file_paths=).with(['factories', 'test/factories', 'spec/factories'])
+
+          Cockroach::FactoryGirl::Loader.load
+        end
       end
     end
   end
