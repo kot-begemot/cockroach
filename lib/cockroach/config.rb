@@ -9,7 +9,7 @@ module Cockroach
 
     class << self
       attr_writer :root
-      attr_accessor :fixturer, :config_path
+      attr_accessor :fixturer, :config_path, :fixtures_path
 
       # Returns root folder for the project, of if one is missing it tries to return
       # Rails.root, if Rails is not defined it will raise an error.
@@ -24,12 +24,13 @@ module Cockroach
       end
     end
 
-    attr_reader :profile, :options
+    attr_reader :profile, :options, :fixtures_path
     
     def initialize path_to_config
       @config_path = File.expand_path path_to_config, self.class.root
       @profile, @options = Cockroach::Config::Loader.parse(@config_path)
       @fixturer_def = get_option('fixturer') || self.class.fixturer || 'factory_girl'
+      @fixtures_path = self.class.fixtures_path if self.class.fixtures_path
     end
 
     def fixturer

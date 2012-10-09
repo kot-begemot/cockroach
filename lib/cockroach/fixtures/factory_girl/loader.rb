@@ -5,7 +5,11 @@ module Cockroach
     class Loader
       def self.load
         old_paths = ::FactoryGirl.definition_file_paths
-        ::FactoryGirl.definition_file_paths = old_paths.collect { |path| File.join(Cockroach::Config.root, path) }
+        if Cockroach::Config.fixtures_path
+          ::FactoryGirl.definition_file_paths = [Cockroach::Config.fixtures_path]
+        else
+          ::FactoryGirl.definition_file_paths = old_paths.collect { |path| File.join(Cockroach::Config.root, path) }
+        end
         ::FactoryGirl.find_definitions
         ::FactoryGirl.definition_file_paths = old_paths
       end

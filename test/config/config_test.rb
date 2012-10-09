@@ -80,6 +80,16 @@ module Cockroach
         assert_equal File.expand_path("../../support/data/correct_with_option.yml", __FILE__), Cockroach.config.instance_variable_get(:@config_path)
       end
 
+      should "set fixtures_path" do
+        Cockroach.setup do |c|
+          c.root = File.expand_path("../../support/data/", __FILE__)
+          c.config_path = "./correct_with_option.yml"
+          c.fixtures_path = "some path to fixtures"
+        end
+
+        assert_equal "some path to fixtures", Cockroach.config.instance_variable_get(:@fixtures_path)
+      end
+
       should "set fixturer" do
         Object.const_set('FactoryBoy', mock('factory-boy'))
         Cockroach.setup do |c|
