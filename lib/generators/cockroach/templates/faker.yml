@@ -3,9 +3,6 @@
 # It just keep the amount of the records that is required to generate, hierarhy
 # and some other details conserning the generation way.
 
-# fixture_gem: :factory_girl
-# fixtures_path: test/fixtures
-
 user_amount: 1000
 
 feeds_ratio: 1000

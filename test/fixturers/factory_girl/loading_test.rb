@@ -34,6 +34,7 @@ module Cockroach
         end
         should "register fixtures" do
           ::FactoryGirl.expects(:definition_file_paths=).with(["/path/to/fixtures"])
+          ::File.expects(:directory?).returns(true)
           ::FactoryGirl.expects(:definition_file_paths=).with(['factories', 'test/factories', 'spec/factories'])
 
           Cockroach::FactoryGirl::Loader.load
