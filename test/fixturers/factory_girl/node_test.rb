@@ -85,26 +85,26 @@ module Cockroach
 
         should "define name from simple structure" do
           users_node = Cockroach::FactoryGirl::Node.new('users_amount' => '100')
-          assert_equal 'users', users_node.name
+          assert_equal 'user', users_node.name
           assert_equal 100, users_node.amount
 
 
           users_node = Cockroach::FactoryGirl::Node.new('users_ratio' => '100')
-          assert_equal 'users', users_node.name
+          assert_equal 'user', users_node.name
           assert users_node.amount.kind_of? Numeric
         end
 
         should "define name from subsequntil structure" do
           users_node = Cockroach::FactoryGirl::Node.new('users' => { 'amount' => '100'})
-          assert_equal 'users', users_node.name
+          assert_equal 'user', users_node.name
           assert_equal 100, users_node.amount
 
           users_node = Cockroach::FactoryGirl::Node.new('users' => { 'ratio' => '100'})
-          assert_equal 'users', users_node.name
+          assert_equal 'user', users_node.name
           assert users_node.amount.kind_of? Numeric
           
           users_node = Cockroach::FactoryGirl::Node.new('users' => { 'ratio' => { 'lower_limit' => '50', 'upper_limit' => '300'}})
-          assert_equal 'users', users_node.name
+          assert_equal 'user', users_node.name
           assert users_node.amount.kind_of? Numeric
         end
 
@@ -159,6 +159,31 @@ module Cockroach
       end
     end
 
+    context "Source" do
+      setup do
+        @lands_node = Cockroach::FactoryGirl::Node.new(
+          'places' => {
+            'as' => 'lands',
+            'amount' => '10'
+          })
+        @users_node = Cockroach::FactoryGirl::Node.new(
+          'users' => {
+            'amount' => '5', 
+            'places' => {
+              'amount' => '10',
+              'source' => 'lands'
+            }
+          })
+      end
+
+#      should "keep all top level names" do
+#        assert_equal @lands_node, Cockroach::FactoryGirl::Node['lands']
+#      end
+
+      should "keeps all ids"
+
+    end
+
     context "Subnode" do
       setup do
         @users_node = Cockroach::FactoryGirl::Node.new('users' => {'amount' => '5', 'places_amount' => '10'})
@@ -167,16 +192,16 @@ module Cockroach
       should "create subnode" do
         assert_equal 1, @users_node.nodes.size
 
-        subnode = @users_node.nodes[0]
+        subnode = @users_node.nodes['place']
 
         assert_instance_of Cockroach::FactoryGirl::Node, subnode
-        assert_equal 'places', subnode.name
+        assert_equal 'place', subnode.name
         assert_equal 'amount', subnode.approach
         assert_equal 10, subnode.amount
       end
 
       should "recive .load! call from supnode" do
-        subnode = @users_node.nodes[0]
+        subnode = @users_node.nodes['place']
         subnode.expects(:load!)
 
         @users_node.__send__(:load_nodes!)
@@ -186,7 +211,7 @@ module Cockroach
         should "send load! call to subnodes" do
           ::FactoryGirl.stubs("create").with("user").returns( *((1..10).to_a.collect {|i| "user#{i}"}) )
 
-          subnode = @users_node.nodes[0]
+          subnode = @users_node.nodes['place']
           subnode.expects(:load!).with({"user" => "user1"})
           subnode.expects(:load!).with({"user" => "user2"})
           subnode.expects(:load!).with({"user" => "user3"})
@@ -200,7 +225,7 @@ module Cockroach
           ::FactoryGirl.expects(:create).with("user").times(5).returns( *((1..10).to_a.collect {|i| "user#{i}"}) )
           ::FactoryGirl.stubs(:create).with("place", any_parameters)
 
-          @users_node.nodes.each {|node| node.stubs(:allowed_options).returns(['user']) }
+          @users_node.nodes.each_value {|node| node.stubs(:allowed_options).returns(['user']) }
 
           @users_node.__send__(:load!)
         end
@@ -214,7 +239,7 @@ module Cockroach
           ::FactoryGirl.expects(:create).with("place", {"user" => "user4"}).times(10)
           ::FactoryGirl.expects(:create).with("place", {"user" => "user5"}).times(10)
 
-          @users_node.nodes.each {|node| node.stubs(:allowed_options).returns(['user']) }
+          @users_node.nodes.each_value {|node| node.stubs(:allowed_options).returns(['user']) }
 
           @users_node.__send__(:load!)
         end

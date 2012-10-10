@@ -9,6 +9,10 @@ module Cockroach
       APPROACHES = %w(amount ratio).freeze
 
       class << self
+        def [](name)
+          @nodes[name.to_s]
+        end
+
         # Method validating structure for Node operations.
         # It will only accepts a structure if it is a Hash object,
         # with one key only.
@@ -46,6 +50,7 @@ module Cockroach
         raise InvalideStructureError.new("Node has faced invalid structure") unless self.class.valid_structure?(structure)
         @node_key, @structure = structure.flatten
         @name, @approach = self.class.extract_info(@node_key.dup)
+        @name = @name.singularize
         if @approach.blank?
           extract_options
           complicated_approch
@@ -69,6 +74,12 @@ module Cockroach
       # number within the provided range and keep it.
       def amount
         @amount || get_random_amount
+      end
+
+      # Returns an aliased node name. The one that will be used for keeping it
+      # in sup and sub structures
+      def node_name
+        @alias_as || @name
       end
 
       protected

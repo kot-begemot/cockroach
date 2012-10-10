@@ -23,9 +23,9 @@ module FactoryGirl
     def mock_factory_girl
       ::FactoryGirl.stubs(:factories)
       ::FactoryGirl.stubs(:find_definitions)
-      ::FactoryGirl.stubs(:factory_by_name).with("users").returns(true)
-      ::FactoryGirl.stubs(:factory_by_name).with("places").returns(true)
-      ::FactoryGirl.stubs(:factory_by_name).with("birds").returns(true)
+      ::FactoryGirl.stubs(:factory_by_name).with("user").returns(true)
+      ::FactoryGirl.stubs(:factory_by_name).with("place").returns(true)
+      ::FactoryGirl.stubs(:factory_by_name).with("bird").returns(true)
       ::FactoryGirl.stubs(:factory_by_name).with("test").raises(ArgumentError.new("Factory not registered: test"))
     end
   end
