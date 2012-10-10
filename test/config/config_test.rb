@@ -2,7 +2,7 @@ require "test_helper"
 
 module Cockroach
   class ConfigTest < Test::Unit::TestCase
-    def setup
+    setup do
       Cockroach::Config.root = File.expand_path("../../support/data/dummy_structure", __FILE__)
     end
     
@@ -48,6 +48,27 @@ module Cockroach
 
           assert_equal :FactoryGirl, config.fixturer
         end
+      end
+    end
+
+    context "Profiler" do
+      setup do
+        Cockroach.setup {|config|}
+      end
+
+      should "be delegated" do
+        assert_instance_of Cockroach::FactoryGirl::Profiler, Cockroach.profiler
+      end
+      
+      should "create and keep new profiler" do
+        assert_instance_of Cockroach::FactoryGirl::Profiler, Cockroach.config.profiler
+      end
+
+      should "hit profiler once" do
+        ::Cockroach::FactoryGirl::Profiler.expects(:new).once.returns(true)
+
+        Cockroach.config.profiler
+        Cockroach.config.profiler
       end
     end
   end

@@ -1,3 +1,5 @@
+require "cockroach/base/node_structure"
+
 module Cockroach
   module Base
     # Node deals only with a specific records class. It makes sure that
@@ -5,14 +7,11 @@ module Cockroach
     # the associations are correctly assigned.
     class Node
       include Cockroach::Base::LoadNodes
+      include Cockroach::Base::NodeStructure
       
       APPROACHES = %w(amount ratio).freeze
 
       class << self
-        def [](name)
-          @nodes[name.to_s]
-        end
-
         # Method validating structure for Node operations.
         # It will only accepts a structure if it is a Hash object,
         # with one key only.
@@ -39,18 +38,18 @@ module Cockroach
           symbol_or_string = symbol_or_string.to_s
           approach = (symbol_or_string.match(/_(#{APPROACHES.join('|')})$/)[1] rescue nil)
           symbol_or_string.gsub!(/(_#{APPROACHES.join('|_')})$/,'') unless approach.blank?
-          [symbol_or_string, approach]
+          [symbol_or_string.to_s.singularize, approach]
         end
       end
 
-      attr_reader :name, :approach # :amount
+      attr_reader :name, :approach, :ids
 
       def initialize *opts
-        structure = opts.size == 1 ? opts[0] : opts
-        raise InvalideStructureError.new("Node has faced invalid structure") unless self.class.valid_structure?(structure)
-        @node_key, @structure = structure.flatten
-        @name, @approach = self.class.extract_info(@node_key.dup)
-        @name = @name.singularize
+        node_name, @structure, @options = extract_params_from_attrs *opts
+        @name, @approach = self.class.extract_info(node_name.dup)
+        @ids = []
+        @source = @structure.delete('source') if @structure.is_a?(Hash)
+
         if @approach.blank?
           extract_options
           complicated_approch
@@ -58,8 +57,10 @@ module Cockroach
         else
           simple_approach
         end
+
         raise InvalideStructureError.new("Approch was not specified") if @approach.blank?
         raise MissingFixtureError.new("Approch was not specified") if @approach.blank?
+        
         after_initialize
       end
 
@@ -83,6 +84,26 @@ module Cockroach
       end
 
       protected
+
+      # There are four possible options here
+      #  - structure
+      #  - node_name, structure
+      #  - structure, options
+      #  - node_name, structure, options
+      def extract_params_from_attrs *attrs
+        structure = if attrs.size == 1 
+          attrs.first
+        elsif attrs.size == 3
+          options = attrs.pop
+          attrs
+        else
+          options = attrs.pop if attrs.first.is_a?(Hash)
+          attrs
+        end
+
+        raise InvalideStructureError.new("Node has faced invalid structure") unless self.class.valid_structure?(structure)
+        structure.flatten << (options || {})
+      end
 
       # Complicated approach is used, once the amount directives were specified
       # within node subconfig.
@@ -114,7 +135,7 @@ module Cockroach
       # Clear the node subconfig. Will extract all the options or directives from
       # provided Hash, and assigne the to the corresponding variables.
       def extract_options
-        @options = @structure.extract!(*APPROACHES).delete_if {|k,v| v.nil?}
+        @options.merge! @structure.extract!(*APPROACHES).delete_if {|k,v| v.nil?}
         @alias_as = @structure.delete("as")
         @structure.each_pair {| key, value | (@aliases ||= {})[$1] = value if key =~ /^(.*)_as$/ }
         @structure.delete_if {| key, value | key =~ /_as$/ }

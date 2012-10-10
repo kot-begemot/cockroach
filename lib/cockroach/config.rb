@@ -37,6 +37,12 @@ module Cockroach
       @fixturer ||= @fixturer_def.to_s.camelize.to_sym
     end
 
+    def profiler
+      @profiler ||= begin
+        Cockroach.const_get(fixturer)::Profiler.new
+      end
+    end
+
     protected
 
     # Options might not be specified at all. In that case @options will be nil

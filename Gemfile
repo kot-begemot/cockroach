@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
-gem "activerecord"
-gem "activesupport"
+gem "activerecord", :require => false
+gem "activesupport", :require => false
 gem "faker"
 
 group :development do

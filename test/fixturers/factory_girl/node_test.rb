@@ -71,15 +71,15 @@ module Cockroach
           end
 
           should "get user name without approach" do
-            assert_equal ["users",nil], Cockroach::FactoryGirl::Node.extract_info("users")
+            assert_equal ["user",nil], Cockroach::FactoryGirl::Node.extract_info("users")
           end
 
           should "get user name with approach: amount" do
-            assert_equal ["users", "amount"], Cockroach::FactoryGirl::Node.extract_info("users_amount")
+            assert_equal ["user", "amount"], Cockroach::FactoryGirl::Node.extract_info("users_amount")
           end
 
           should "get user name with approach: ratio" do
-            assert_equal ["users", "ratio"], Cockroach::FactoryGirl::Node.extract_info("users_ratio")
+            assert_equal ["user", "ratio"], Cockroach::FactoryGirl::Node.extract_info("users_ratio")
           end
         end
 
@@ -176,11 +176,18 @@ module Cockroach
           })
       end
 
-#      should "keep all top level names" do
-#        assert_equal @lands_node, Cockroach::FactoryGirl::Node['lands']
-#      end
+      #      should "keep all top level names" do
+      #        assert_equal @lands_node, Cockroach::FactoryGirl::Node['lands']
+      #      end
 
-      should "keeps all ids"
+      should "keeps all ids" do
+        mocks = ((1..10).to_a.collect {|i| stub('place', :id => i) })
+
+        ::FactoryGirl.stubs("create").with("place").returns( *mocks )
+        @lands_node.__send__(:load!)
+        
+        assert_equal (1..10).to_a, @lands_node.ids
+      end
 
     end
 
@@ -209,21 +216,26 @@ module Cockroach
 
       context "Heritage" do
         should "send load! call to subnodes" do
-          ::FactoryGirl.stubs("create").with("user").returns( *((1..10).to_a.collect {|i| "user#{i}"}) )
+          mocks = ((1..5).to_a.collect {|i| stub('user', :id => i) })
+
+          ::FactoryGirl.stubs("create").with("user").returns( *mocks )
 
           subnode = @users_node.nodes['place']
-          subnode.expects(:load!).with({"user" => "user1"})
-          subnode.expects(:load!).with({"user" => "user2"})
-          subnode.expects(:load!).with({"user" => "user3"})
-          subnode.expects(:load!).with({"user" => "user4"})
-          subnode.expects(:load!).with({"user" => "user5"})
+          subnode.expects(:load!).with({"user" => mocks[0]})
+          subnode.expects(:load!).with({"user" => mocks[1]})
+          subnode.expects(:load!).with({"user" => mocks[2]})
+          subnode.expects(:load!).with({"user" => mocks[3]})
+          subnode.expects(:load!).with({"user" => mocks[4]})
 
           @users_node.__send__(:load!)
         end
 
         should "initiate parrent record exact times" do
-          ::FactoryGirl.expects(:create).with("user").times(5).returns( *((1..10).to_a.collect {|i| "user#{i}"}) )
-          ::FactoryGirl.stubs(:create).with("place", any_parameters)
+          mocks = ((1..5).to_a.collect {|i| stub('user', :id => i) })
+          place_mock = stub('place', :id => 0)
+
+          ::FactoryGirl.expects(:create).with("user").times(5).returns( *mocks )
+          ::FactoryGirl.stubs(:create).with("place", any_parameters).returns(place_mock)
 
           @users_node.nodes.each_value {|node| node.stubs(:allowed_options).returns(['user']) }
 
@@ -231,13 +243,16 @@ module Cockroach
         end
 
         should "initiate child records exact times" do
-          ::FactoryGirl.stubs("create").with("user").returns( *((1..10).to_a.collect {|i| "user#{i}"}) )
+          mocks = ((1..5).to_a.collect {|i| stub('user', :id => i) })
+          place_mock = stub('place', :id => 0)
+          
+          ::FactoryGirl.stubs("create").with("user").returns( *mocks )
 
-          ::FactoryGirl.expects(:create).with("place", {"user" => "user1"}).times(10)
-          ::FactoryGirl.expects(:create).with("place", {"user" => "user2"}).times(10)
-          ::FactoryGirl.expects(:create).with("place", {"user" => "user3"}).times(10)
-          ::FactoryGirl.expects(:create).with("place", {"user" => "user4"}).times(10)
-          ::FactoryGirl.expects(:create).with("place", {"user" => "user5"}).times(10)
+          ::FactoryGirl.expects(:create).with("place", {"user" => mocks[0]}).times(10).returns(place_mock)
+          ::FactoryGirl.expects(:create).with("place", {"user" => mocks[1]}).times(10).returns(place_mock)
+          ::FactoryGirl.expects(:create).with("place", {"user" => mocks[2]}).times(10).returns(place_mock)
+          ::FactoryGirl.expects(:create).with("place", {"user" => mocks[3]}).times(10).returns(place_mock)
+          ::FactoryGirl.expects(:create).with("place", {"user" => mocks[4]}).times(10).returns(place_mock)
 
           @users_node.nodes.each_value {|node| node.stubs(:allowed_options).returns(['user']) }
 

@@ -1,4 +1,5 @@
-require 'active_support'
+require "active_support/dependencies/autoload"
+require "active_support/core_ext/module"
 require "cockroach/railtie" if defined?(Rails)
 
 module Cockroach
@@ -20,17 +21,21 @@ module Cockroach
   class MissingFixtureError < Exception; end
 
   mattr_reader :config
-
-  def self.setup &block
-    block.yield(Cockroach::Config)
-    @@config = Cockroach::Config.new (Cockroach::Config.config_path || "config/faker.yml")
-    load_fixturer
-  end
   
-  private
+  class << self
+    delegate :profiler, :to => :config
+    
+    def setup &block
+      block.yield(Cockroach::Config)
+      @@config = Cockroach::Config.new (Cockroach::Config.config_path || "config/faker.yml")
+      load_fixturer
+    end
+  
+    private
 
-  #
-  def self.load_fixturer
-    self.const_get(@@config.fixturer)
+    #
+    def load_fixturer
+      self.const_get(@@config.fixturer)
+    end
   end
 end

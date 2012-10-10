@@ -19,6 +19,7 @@ module Cockroach
           current_factory = !normalised_opts.blank? ?
             ::FactoryGirl.create(name, normalised_opts) :
             ::FactoryGirl.create(name)
+          ids << current_factory.id
           unless nodes.blank?
             load_nodes! (factory_opts || {}).merge({ node_name => current_factory})
           end

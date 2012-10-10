@@ -11,8 +11,7 @@ namespace :cockroach do
 
     puts "Considering factory location as: #{Cockroach.config.fixtures_path || Cockroach::Config.root}"
 
-    @profile = Cockroach::FactoryGirl::Profiler.new
-    @profile.load
+    Cockroach.profiler.load
     puts "Config file is valid!"
   end
 
@@ -20,7 +19,7 @@ namespace :cockroach do
   task :generate, [:config_path] => [:environment] do |task, args|
     Rake::Task["cockroach:validate"].invoke(args[:config_path])
 
-    @profile.load!
+    Cockroach.profiler.load!
   end
 
   desc "Trancate the database, load seeds and run Cockroach generator"

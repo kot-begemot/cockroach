@@ -30,7 +30,7 @@ module Cockroach
       should "load! should preload nodes" do
         profiler = Cockroach::FactoryGirl::Profiler.new
 
-        profiler.instance_variable_set(:@nodes, [])
+        profiler.instance_variable_set(:@nodes, {})
 
         profiler.expects(:load)
 
@@ -38,13 +38,23 @@ module Cockroach
       end
 
       context "Subnodes" do
+
+        context "Access" do
+          should "be from top level" do
+            profiler = Cockroach::FactoryGirl::Profiler.new
+            assert_equal @users_node, profiler['person']
+          end
+        end
+        
         should "loading" do
           profiler = Cockroach::FactoryGirl::Profiler.new
 
           assert_nil profiler.instance_variable_get(:@loaded)
 
-          Cockroach::FactoryGirl::Node.stubs(:new).with(any_parameters)
-          Cockroach::FactoryGirl::Node.expects(:new).with("users_amount",1000)
+          fake_node = mock()
+          fake_node.stubs(:node_name).returns('name')
+          Cockroach::FactoryGirl::Node.stubs(:new).with(any_parameters).returns(fake_node)
+          Cockroach::FactoryGirl::Node.expects(:new).with("users_amount",1000).returns(fake_node)
 
           assert profiler.load
           assert profiler.instance_variable_get(:@loaded)
@@ -55,7 +65,7 @@ module Cockroach
 
           profiler.load
 
-          profiler.nodes.each do |node|
+          profiler.nodes.each_value do |node|
             node.stubs(:load!)
             node.expects(:load!)
           end
@@ -90,13 +100,17 @@ module Cockroach
       should "load! without error" do
         ::FactoryGirl.stubs(:factory_by_name).with(any_parameters)
 
-        ::FactoryGirl.expects(:create).with("witness").times(6).returns( *((1..10).to_a.collect {|i| "witness#{i}"}) )
-        ::FactoryGirl.expects(:create).with("message", {"author" => "witness1"}).at_least(1).at_most(6)
-        ::FactoryGirl.expects(:create).with("message", {"author" => "witness2"}).at_least(1).at_most(6)
-        ::FactoryGirl.expects(:create).with("message", {"author" => "witness3"}).at_least(1).at_most(6)
-        ::FactoryGirl.expects(:create).with("message", {"author" => "witness4"}).at_least(1).at_most(6)
-        ::FactoryGirl.expects(:create).with("message", {"author" => "witness5"}).at_least(1).at_most(6)
-        ::FactoryGirl.expects(:create).with("message", {"author" => "witness6"}).at_least(1).at_most(6)
+        mocks = ((1..6).to_a.collect {|i| stub('witness', :id => i) })
+        message_mock = stub('message', :id => 0)
+
+        ::FactoryGirl.expects(:create).with("witness").times(6).returns( *mocks )
+
+        ::FactoryGirl.expects(:create).with("message", {"author" => mocks[0]}).at_least(1).at_most(6).returns(message_mock)
+        ::FactoryGirl.expects(:create).with("message", {"author" => mocks[1]}).at_least(1).at_most(6).returns(message_mock)
+        ::FactoryGirl.expects(:create).with("message", {"author" => mocks[2]}).at_least(1).at_most(6).returns(message_mock)
+        ::FactoryGirl.expects(:create).with("message", {"author" => mocks[3]}).at_least(1).at_most(6).returns(message_mock)
+        ::FactoryGirl.expects(:create).with("message", {"author" => mocks[4]}).at_least(1).at_most(6).returns(message_mock)
+        ::FactoryGirl.expects(:create).with("message", {"author" => mocks[5]}).at_least(1).at_most(6).returns(message_mock)
 
         Cockroach::FactoryGirl::Node.any_instance.stubs(:allowed_options).returns(['author'])
 
