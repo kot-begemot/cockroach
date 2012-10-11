@@ -8,6 +8,8 @@ module Cockroach
   autoload :VERSION
   autoload :Config
 
+  autoload :Source
+
   module Base
     autoload :Node, 'cockroach/base/node'
     autoload :LoadNodes, 'cockroach/base/load_nodes'

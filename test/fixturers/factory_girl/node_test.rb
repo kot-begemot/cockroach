@@ -180,40 +180,6 @@ module Cockroach
         
         assert_equal (1..10).to_a, @lands_node.ids
       end
-
-      should "find return nil if no record created yet" do
-        assert_nil @lands_node.find 1
-      end
-      
-      should "random return nil if no record created yet" do
-        assert_nil @lands_node.sample
-      end
-
-      should "return record with certain id" do
-        places = ((1..10).to_a.collect {|i| stub('place', :id => i) })
-        ::FactoryGirl.stubs("create").with("place").returns( *places )
-        @lands_node.__send__(:load!)
-
-        place_class = stub('place_clase')
-        place_class.stubs(:find).with(6).returns(p = places[5])
-        factory = @lands_node.instance_variable_get(:@factory)
-        factory.stubs(:send).with(:class_name).returns(place_class)
-
-        assert_equal p, @lands_node.find(6)
-      end
-
-      should "return random record" do
-        places = ((1..10).to_a.collect {|i| stub('place', :id => i) })
-        ::FactoryGirl.stubs("create").with("place").returns( *places )
-        @lands_node.__send__(:load!)
-
-        place_class = stub('place_clase')
-        place_class.stubs(:find).with(any_parameters).returns(p = places.sample)
-        factory = @lands_node.instance_variable_get(:@factory)
-        factory.stubs(:send).with(:class_name).returns(place_class)
-
-        assert_equal p, @lands_node.sample
-      end
       
       should "define return class from factory" do
         place_stub = stub('place_instance')
@@ -249,7 +215,61 @@ module Cockroach
 
         places_node = users_node['place']
 
-        assert_equal path_node, places_node.instance_variable_get(:@source)
+        source = places_node.instance_variable_get(:@source)
+        
+        assert_instance_of Cockroach::Source::Node, source
+        assert_equal path_node, source.node
+      end
+
+      context "Database" do
+        setup do
+          profiler = stub('profiler')
+          @lands_node = stub('lands')
+          profiler.stubs(:[]).with('lands').returns(@lands_node)
+          ::Cockroach.stubs(:profiler).returns(profiler)
+
+          @old_const = Object.const_get(:Place) if Object.const_defined?(:Place)
+          silence_warnings { Object.const_set(:Place, stub('Place')) }
+
+          @users_node = Cockroach::FactoryGirl::Node.new(
+            'users' => {
+              'amount' => '5',
+              'places' => {
+                'amount' => '10',
+                'source' => {
+                  'model' => 'Place'
+                }
+              }
+            })
+        end
+
+        teardown do
+          if @old_const
+            silence_warnings { Object.const_set('Place', @old_const) }
+          end
+        end
+
+        should "define_source" do
+          places_node = @users_node['place']
+
+          source = places_node.instance_variable_get(:@source)
+
+          assert_instance_of Cockroach::Source::Model, source
+          assert_equal 'Place'.constantize, source.model
+        end
+
+        should "assign record to parrent if source defined" do
+          places_node  = @users_node['place']
+          places_node.stubs(:allowed_options).returns(["user"])
+
+          places = ((1..10).to_a.collect {|i| stub('place_instance', :id => i) })
+          source = places_node.instance_variable_get(:@source)
+          source.stubs(:sample).returns(p = places[4])
+
+          p.expects(:update_attributes).with({"user" => @users_node}).times(10)
+
+          places_node.__send__(:load!, {"user" => @users_node})
+        end
       end
 
       context "Other node" do
@@ -272,7 +292,10 @@ module Cockroach
         should "define_source" do
           places_node = @users_node['place']
 
-          assert_equal @lands_node, places_node.instance_variable_get(:@source)
+          source = places_node.instance_variable_get(:@source)
+
+          assert_instance_of Cockroach::Source::Node, source
+          assert_equal @lands_node, source.node
         end
 
         should "assign record to parrent if source defined" do
@@ -280,7 +303,8 @@ module Cockroach
           places_node.stubs(:allowed_options).returns(["user"])
 
           places = ((1..10).to_a.collect {|i| stub('place_instance', :id => i) })
-          @lands_node.stubs(:sample).returns(p = places[4])
+          source = places_node.instance_variable_get(:@source)
+          source.stubs(:sample).returns(p = places[4])
 
           p.expects(:update_attributes).with({"user" => @users_node}).times(10)
 
