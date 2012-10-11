@@ -16,9 +16,7 @@ module Cockroach
         end
 
         amount.times do
-          current_factory = !normalised_opts.blank? ?
-            ::FactoryGirl.create(name, normalised_opts) :
-            ::FactoryGirl.create(name)
+          current_factory = generate_current_factory(normalised_opts)
           ids << current_factory.id
           unless nodes.blank?
             load_nodes! (factory_opts || {}).merge({ node_name => current_factory})
@@ -27,9 +25,26 @@ module Cockroach
       end
 
       protected
+      
+      def generate_current_factory options
+        if @source
+          ret = @source.sample
+          ret.update_attributes(options) unless options.blank?
+        else
+          options.blank? ?
+            ret = ::FactoryGirl.create(name) :
+            ret = ::FactoryGirl.create(name, options)
+        end
+        ret
+      end
 
       def allowed_options
         @allowed_options ||= @factory.send(:evaluator_class).attribute_list.names.map(&:to_s)
+      end
+
+      # Returns class deducted from factory
+      def orm_class
+        @factory.send(:class_name)
       end
     end
   end

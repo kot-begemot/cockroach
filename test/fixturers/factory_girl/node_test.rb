@@ -166,14 +166,6 @@ module Cockroach
             'as' => 'lands',
             'amount' => '10'
           })
-        @users_node = Cockroach::FactoryGirl::Node.new(
-          'users' => {
-            'amount' => '5', 
-            'places' => {
-              'amount' => '10',
-              'source' => 'lands'
-            }
-          })
       end
 
       #      should "keep all top level names" do
@@ -189,6 +181,112 @@ module Cockroach
         assert_equal (1..10).to_a, @lands_node.ids
       end
 
+      should "find return nil if no record created yet" do
+        assert_nil @lands_node.find 1
+      end
+      
+      should "random return nil if no record created yet" do
+        assert_nil @lands_node.sample
+      end
+
+      should "return record with certain id" do
+        places = ((1..10).to_a.collect {|i| stub('place', :id => i) })
+        ::FactoryGirl.stubs("create").with("place").returns( *places )
+        @lands_node.__send__(:load!)
+
+        place_class = stub('place_clase')
+        place_class.stubs(:find).with(6).returns(p = places[5])
+        factory = @lands_node.instance_variable_get(:@factory)
+        factory.stubs(:send).with(:class_name).returns(place_class)
+
+        assert_equal p, @lands_node.find(6)
+      end
+
+      should "return random record" do
+        places = ((1..10).to_a.collect {|i| stub('place', :id => i) })
+        ::FactoryGirl.stubs("create").with("place").returns( *places )
+        @lands_node.__send__(:load!)
+
+        place_class = stub('place_clase')
+        place_class.stubs(:find).with(any_parameters).returns(p = places.sample)
+        factory = @lands_node.instance_variable_get(:@factory)
+        factory.stubs(:send).with(:class_name).returns(place_class)
+
+        assert_equal p, @lands_node.sample
+      end
+      
+      should "define return class from factory" do
+        place_stub = stub('place_instance')
+
+        factory = @lands_node.instance_variable_get(:@factory)
+        factory.stubs(:send).with(:class_name).returns(place_stub)
+
+        assert_equal place_stub, @lands_node.__send__(:orm_class)
+      end
+
+      should "define_source" do
+        profiler = stub('profiler')
+        some_node = stub('some')
+        fancy_node = stub('fancy')
+        path_node = stub('path')
+        fancy_node.stubs(:[]).with('path').returns(path_node)
+        some_node.stubs(:[]).with('fancy').returns(fancy_node)
+        profiler.stubs(:[]).with('some').returns(some_node)
+        ::Cockroach.stubs(:profiler).returns(profiler)
+
+        users_node = Cockroach::FactoryGirl::Node.new(
+          'users' => {
+            'amount' => '5',
+            'places' => {
+              'amount' => '10',
+              'source' => {
+                'some' => {
+                  'fancy' => 'path'
+                }
+              }
+            }
+          })
+
+        places_node = users_node['place']
+
+        assert_equal path_node, places_node.instance_variable_get(:@source)
+      end
+
+      context "Other node" do
+        setup do
+          profiler = stub('profiler')
+          @lands_node = stub('lands')
+          profiler.stubs(:[]).with('lands').returns(@lands_node)
+          ::Cockroach.stubs(:profiler).returns(profiler)
+
+          @users_node = Cockroach::FactoryGirl::Node.new(
+            'users' => {
+              'amount' => '5',
+              'places' => {
+                'amount' => '10',
+                'source' => 'lands'
+              }
+            })
+        end
+
+        should "define_source" do
+          places_node = @users_node['place']
+
+          assert_equal @lands_node, places_node.instance_variable_get(:@source)
+        end
+
+        should "assign record to parrent if source defined" do
+          places_node  = @users_node['place']
+          places_node.stubs(:allowed_options).returns(["user"])
+
+          places = ((1..10).to_a.collect {|i| stub('place_instance', :id => i) })
+          @lands_node.stubs(:sample).returns(p = places[4])
+
+          p.expects(:update_attributes).with({"user" => @users_node}).times(10)
+
+          places_node.__send__(:load!, {"user" => @users_node})
+        end
+      end
     end
 
     context "Subnode" do
