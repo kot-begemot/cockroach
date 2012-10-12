@@ -44,7 +44,7 @@ module Cockroach
 
       # Returns class deducted from factory
       def orm_class
-        @factory.send(:class_name)
+        @factory.send(:build_class)
       end
     end
   end

@@ -185,7 +185,7 @@ module Cockroach
         place_stub = stub('place_instance')
 
         factory = @lands_node.instance_variable_get(:@factory)
-        factory.stubs(:send).with(:class_name).returns(place_stub)
+        factory.stubs(:send).with(:build_class).returns(place_stub)
 
         assert_equal place_stub, @lands_node.__send__(:orm_class)
       end

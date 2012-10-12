@@ -16,21 +16,45 @@ module Cockroach
       context "Node" do
         setup do
           profiler = stub('profiler')
-          some_node = stub('some')
-          fancy_node = stub('fancy')
+          @some_node = stub('some')
+          @fancy_node = stub('fancy')
           @path_node = stub('path')
-          fancy_node.stubs(:[]).with('path').returns(@path_node)
-          some_node.stubs(:[]).with('fancy').returns(fancy_node)
-          profiler.stubs(:[]).with('some').returns(some_node)
+          @fancy_node.stubs(:[]).with('path').returns(@path_node)
+          @some_node.stubs(:[]).with('fancy').returns(@fancy_node)
+          profiler.stubs(:[]).with('some').returns(@some_node)
           ::Cockroach.stubs(:profiler).returns(profiler)
         end
 
-        should "get model with reference option" do
+        should "get node with association option" do
           Cockroach::Source::Node.expects(:new).with(@path_node, {"association" => "temp"})
 
           Cockroach::Source.get_source({
               "some" => {
                 "fancy" => "path"},
+              "association" => "temp"})
+        end
+
+        should "get node with node option" do
+          Cockroach::Source::Node.expects(:new).with(@some_node, {})
+
+          Cockroach::Source.get_source({"node" => "some"})
+        end
+
+        should "get node with node option and association" do
+          Cockroach::Source::Node.expects(:new).with(@some_node, {'association' => 'temp'})
+
+          Cockroach::Source.get_source({
+              "node" => "some",
+              "association" => "temp"})
+        end
+
+        should "get node with node option(as node path) and association" do
+          Cockroach::Source::Node.expects(:new).with(@path_node, {'association' => 'temp'})
+
+          Cockroach::Source.get_source({
+              "node" => {
+                "some" => {"fancy" => "path"}
+              },
               "association" => "temp"})
         end
       end
@@ -48,7 +72,7 @@ module Cockroach
           end
         end
 
-        should "get model with reference option" do
+        should "get model with association option" do
           Cockroach::Source::Model.expects(:new).with(Place, {"association" => "temp"})
 
           Cockroach::Source.get_source({"model" => "Place", "association" => "temp"})
@@ -100,7 +124,7 @@ module Cockroach
         place_class = stub('place_clase')
         place_class.stubs(:find).with(6).returns(p = places[5])
         factory = @lands_node.instance_variable_get(:@factory)
-        factory.stubs(:send).with(:class_name).returns(place_class)
+        factory.stubs(:send).with(:build_class).returns(place_class)
 
         assert_equal p, @source.send(:find, 6)
       end
@@ -113,7 +137,7 @@ module Cockroach
         place_class = stub('place_clase')
         place_class.stubs(:find).with(any_parameters).returns(p = places.sample)
         factory = @lands_node.instance_variable_get(:@factory)
-        factory.stubs(:send).with(:class_name).returns(place_class)
+        factory.stubs(:send).with(:build_class).returns(place_class)
 
         assert_equal p, @source.sample
       end

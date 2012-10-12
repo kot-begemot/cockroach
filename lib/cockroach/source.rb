@@ -21,14 +21,29 @@ module Cockroach
         Cockroach::Source::Model.new model_name.to_s.constantize, source_refs
       end
 
+      # Many ways to provide reference to Node.
+      # First is:
+      #   just string
+      # Next one is:
+      #   hash with "node" key
+      #   the value may be either hash or string
+      # Or Just hash
+      #
+      # Possible options are:
+      #   association
       def get_node source_refs
         if source_refs.is_a?(String)
           source_path, options = [source_refs], {}
         else
-          options = source_refs.extract!("association")
-          source_path = source_refs.flatten
-          while source_path.last.is_a? Hash
-            source_path << source_path.pop.flatten
+          options = source_refs.extract!("association").keep_if {|k,v| !v.blank?}
+          source_path = source_refs.include?("node") ? source_refs.delete('node') : source_refs
+          source_path = source_path.flatten if (source_path.is_a?(Hash))
+          if source_path.is_a?(String)
+            source_path = [source_path]
+          else
+            while source_path.last.is_a? Hash
+              source_path << source_path.pop.flatten
+            end
           end
         end
         source_path.flatten!
