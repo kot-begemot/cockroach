@@ -63,7 +63,7 @@ Gem::Specification.new do |s|
     "test/support/models/user.rb",
     "test/test_helper.rb"
   ]
-  s.homepage = "http://google.it"
+  s.homepage = "https://github.com/artirix/cockroach"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = "1.8.10"
