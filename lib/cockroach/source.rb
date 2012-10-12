@@ -5,7 +5,7 @@ module Cockroach
 
     class << self
       def get_source source_refs
-        if source_refs.is_a?(Hash) && source_refs.keys.first == 'model'
+        if source_refs.is_a?(Hash) && source_refs.keys.include?('model')
           get_model source_refs
         else
           get_node source_refs
@@ -15,8 +15,8 @@ module Cockroach
       protected
 
       def get_model source_refs
-        model_name = source_refs.flatten.last
-        Cockroach::Source::Model.new model_name.to_s.constantize
+        model_name = source_refs.delete('model')
+        Cockroach::Source::Model.new model_name.to_s.constantize, source_refs
       end
 
       def get_node source_refs
