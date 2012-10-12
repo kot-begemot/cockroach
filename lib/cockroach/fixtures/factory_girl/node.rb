@@ -30,12 +30,12 @@ module Cockroach
         if @source
           ret = @source.sample
           ret.update_attributes(options) unless options.blank?
+          ret
         else
           options.blank? ?
-            ret = ::FactoryGirl.create(name) :
-            ret = ::FactoryGirl.create(name, options)
+            ::FactoryGirl.create(name) :
+            ::FactoryGirl.create(name, options)
         end
-        ret
       end
 
       def allowed_options

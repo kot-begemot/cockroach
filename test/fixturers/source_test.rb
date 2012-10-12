@@ -58,7 +58,34 @@ module Cockroach
     end
 
     context "Model" do
+      setup do
+        @old_const = Object.const_get(:Place) if Object.const_defined?(:Place)
+        @place = stub('Place')
+        silence_warnings { Object.const_set(:Place, @place) }
 
+        @source = Cockroach::Source::Model.new Place
+      end
+
+      teardown do
+        if @old_const
+          silence_warnings { Object.const_set('Place', @old_const) }
+        end
+      end
+
+      should "return record with certain id" do
+        places = ((1..10).to_a.collect {|i| stub('place', :id => i) })
+        @place.stubs(:find).with(6).returns(p = places[5])
+        
+        assert_equal p, @source.find(6)
+      end
+
+      should "return random record" do
+        places = ((1..10).to_a.collect {|i| stub('place', :id => i) })
+        @place.stubs(:order).with("RAND()").returns(@place)
+        @place.stubs(:first).returns(p = places.sample)
+
+        assert_equal p, @source.sample
+      end
     end
   end
 end
