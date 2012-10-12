@@ -27,8 +27,6 @@ After the gem was installed, all the required files may now be generated with Ra
 
     $ bundle exec rails g cockroach:install
 
-That will create config/faker.yml
-
 # Rake tasks
 
 There are several rake tasks available:
@@ -114,6 +112,8 @@ A brief examples:
           lower_limit: 100
           upper_limit: 1000
         address_amount: 1
+
+### For further information check out project Wiki pages ;)
 
 ### Contributing
 
