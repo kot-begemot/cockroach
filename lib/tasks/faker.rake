@@ -20,6 +20,9 @@ namespace :cockroach do
     Rake::Task["cockroach:validate"].invoke(args[:config_path])
 
     Cockroach.profiler.load!
+
+    stats_collector = Cockroach::Statistics.new
+    stats_collector.print_stats!
   end
 
   desc "Trancate the database, load seeds and run Cockroach generator"
