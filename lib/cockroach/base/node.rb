@@ -42,7 +42,7 @@ module Cockroach
         end
       end
 
-      attr_reader :name, :approach, :ids, :source
+      attr_reader :name, :approach, :ids, :source, :generated_amount
 
       delegate :find, :sample, :to => :source
 
@@ -51,6 +51,7 @@ module Cockroach
         @name, @approach = self.class.extract_info(node_name.dup)
         @ids = []
         @source = define_source if @structure.is_a?(Hash)
+        @generated_amount = 0
 
         if @approach.blank?
           extract_options

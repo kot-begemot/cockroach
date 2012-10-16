@@ -15,7 +15,9 @@ module Cockroach
           normalised_opts.keep_if {|k,v| allowed_options.include? k }
         end
 
-        amount.times do
+        times = amount
+        @generated_amount += times
+        times.times do
           current_factory = generate_current_factory(normalised_opts)
           ids << current_factory.id
           unless nodes.blank?

@@ -9,6 +9,7 @@ module Cockroach
   autoload :Config
 
   autoload :Source
+  autoload :Statistics
 
   module Base
     autoload :Node, 'cockroach/base/node'

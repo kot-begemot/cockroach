@@ -335,6 +335,30 @@ module Cockroach
 
         @users_node.__send__(:load_nodes!)
       end
+      
+      context "Statistics" do
+        setup do
+          mocks = ((1..5).to_a.collect {|i| stub('user', :id => i) })
+          place_mock = stub('place', :id => 0)
+
+          ::FactoryGirl.expects(:create).with("user").times(5).returns( *mocks )
+          ::FactoryGirl.stubs(:create).with("place", any_parameters).returns(place_mock)
+
+          @users_node.nodes.each_value {|node| node.stubs(:allowed_options).returns(['user']) }
+        end
+
+        should "have total after it was loaded" do
+          subnode = @users_node.nodes['place']
+
+          assert_equal 0, @users_node.generated_amount
+          assert_equal 0, subnode.generated_amount
+
+          @users_node.__send__(:load!)
+
+          assert_equal 5, @users_node.generated_amount
+          assert_equal 50, subnode.generated_amount
+        end
+      end
 
       context "Heritage" do
         should "send load! call to subnodes" do
