@@ -29,14 +29,19 @@ module Cockroach
       protected
       
       def generate_current_factory options
-        if @source
-          ret = @source.sample
-          ret.update_attributes(options) unless options.blank?
-          ret
-        else
-          options.blank? ?
-            ::FactoryGirl.create(name) :
-            ::FactoryGirl.create(name, options)
+        begin 
+          if @source
+            ret = @source.sample
+            ret.update_attributes(options) unless options.blank?
+            ret
+          else
+            options.blank? ?
+              ::FactoryGirl.create(name) :
+              ::FactoryGirl.create(name, options)
+          end
+        rescue
+          puts "Exception occured during node evaliation: #{node_name}"
+          raise $!
         end
       end
 
