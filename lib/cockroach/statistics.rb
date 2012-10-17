@@ -49,7 +49,7 @@ HEADER
       if s && (source = s.source)
         source.kind_of?(Cockroach::Base::Node) ?
           "Node(#{source.node_name})" :
-          "Model(#{source.display_name})"
+          "Model(#{source.to_s})"
       else
         ''
       end
