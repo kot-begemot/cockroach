@@ -1,7 +1,12 @@
 module Cockroach
   class Statistics
     attr_reader :profiler
-    TABLE_LENGTH = 50
+
+    class << self
+      def table_length
+        %{tput cols}.to_i rescue 80
+      end
+    end
 
     def initialize(profiler = nil)
       @profiler = profiler || Cockroach.profiler
@@ -30,19 +35,28 @@ module Cockroach
 
     def header
       <<HEADER
-      #{"*"*TABLE_LENGTH}
-      * #{"Cockroarch statistics".ljust(TABLE_LENGTH-4)} *
-      #{"="*TABLE_LENGTH}
+#{"*"*table_length}
+* #{"Cockroarch statistics".ljust(table_length-4)} *
+#{"="*table_length}
 HEADER
     end
 
     def footer
-      "*"*TABLE_LENGTH
+      "*"*table_length
     end
 
     def line_for_node node, level
-      "* " << node.node_name.rjust(level).ljust(TABLE_LENGTH - 30) << " * " <<
-        string_for_source(node.source).ljust(15) << " * " << node.generated_amount.to_s.rjust(5) << " *"
+      pure_space = table_length - 10
+      amount_column_lenght = pure_space / 5
+      node_name_column_lenght = (pure_space - amount_column_lenght) / 2
+      source_column_length = pure_space - amount_column_lenght - node_name_column_lenght
+      "* " << node.node_name.rjust(level).ljust(node_name_column_lenght) << " * " <<
+        string_for_source(node.source).ljust(source_column_length) << " * " <<
+        node.generated_amount.to_s.rjust(amount_column_lenght) << " *"
+    end
+
+    def table_length
+      @table_length ||= self.class.table_length
     end
 
     def string_for_source s

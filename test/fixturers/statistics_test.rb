@@ -54,7 +54,9 @@ module Cockroach
       end
 
       should "return nice line" do
-        assert_equal "* witness              *                 *     6 *",
+        Cockroach::Statistics.expects(:table_length).returns(50)
+
+        assert_equal "* witness          *                  *        6 *",
           @stats.send(:line_for_node, @profile.nodes["witness"], 0)
       end
       should "print statistics"
