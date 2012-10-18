@@ -4,7 +4,7 @@ module Cockroach
 
     class << self
       def table_length
-        %{tput cols}.to_i rescue 80
+        %x{tput cols}.to_i rescue 80
       end
     end
 
