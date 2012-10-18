@@ -1,4 +1,4 @@
-require "psych"
+#require "psych"
 require "yaml"
 
 module Cockroach
@@ -21,7 +21,7 @@ module Cockroach
         #
         def parse path_to_config
           raise ConfigNotExistsError.new("File under the path \"#{path_to_config}\", does not exists.") unless File.exists?(path_to_config)
-          contents = YAML.load_file path_to_config
+          contents = YAML.load(ERB.new(File.read(path_to_config)).result)
 
           options = contents.extract!(*CONSTRAINTS)
           options.delete_if {|key, value| value == nil }

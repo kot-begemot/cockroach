@@ -35,6 +35,22 @@ module Cockroach
           assert config.last.is_a? Hash
           assert_equal 2, config.size
         end
+
+        context "with Erb" do
+          should "return array with options" do
+            config = nil
+            assert_nothing_thrown do
+              config = Cockroach::Config::Loader.parse File.expand_path("../support/data/correct_with_erb.yml", File.dirname(__FILE__))
+            end
+
+            assert config.is_a? Array
+            assert (content = config.first).is_a? Hash
+            assert config.last.is_a? Hash
+            assert_equal 2, config.size
+
+            assert_equal 1000, content['feeds_ratio']
+          end
+        end
       end
     end
   end

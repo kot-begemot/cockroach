@@ -1,0 +1,13 @@
+fixture_gem: :factory_girl
+fixtures_path: test/fixtures
+
+users_amount: 1000
+feeds_ratio: <%= "1000" %>
+ships:
+  amount: 200
+boats:
+  ratio: 2000
+corsair:
+  ratio:
+    upper_limit: 200
+    lower_limit: 100
