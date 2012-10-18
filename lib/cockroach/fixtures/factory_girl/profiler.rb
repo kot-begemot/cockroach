@@ -16,12 +16,20 @@ module Cockroach
       def load
         unless @loaded
           Cockroach::FactoryGirl::Loader.load
-          @source.each_pair do |name, structure|
-            node = Cockroach::FactoryGirl::Node.new(name, structure)
-            nodes[node.node_name] = node
+          @source.each_pair do |factory_name, structure|
+            if structure.kind_of? Array
+              structure.each.map {|node_structure| load_node(factory_name, node_structure)}
+            else
+              load_node(factory_name, structure)
+            end
           end
           @loaded = true
         end
+      end
+
+      def load_node fixture_name, node_structure
+        node = Cockroach::FactoryGirl::Node.new(fixture_name, node_structure)
+        nodes[node.node_name] = node
       end
 
       # This method will load all the mentioned records into database

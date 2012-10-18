@@ -20,10 +20,18 @@ module Cockroach
 
         # Parse structure file and create a branch of sub nodes.
         def load_nodes
-          @structure.each do |name, structure|
-            node = Cockroach::FactoryGirl::Node.new(name, structure, {:parrent => self})
-            nodes[node.node_name] = node
+          @structure.each do |fixture_name, structure|
+            if structure.kind_of? Array
+              structure.each.map {|node_structure| load_node(fixture_name, node_structure)}
+            else
+              load_node(fixture_name, structure)
+            end
           end
+        end
+
+        def load_node fixture_name, node_structure
+          node = Cockroach::FactoryGirl::Node.new(fixture_name, node_structure, {:parrent => self})
+          nodes[node.node_name] = node
         end
 
         # Load all the sub nodes

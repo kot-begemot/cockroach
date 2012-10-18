@@ -3,18 +3,46 @@ require "user"
 
 module Cockroach
   class FactoryGirlProfilerTest < Test::Unit::TestCase
+    setup do
+      before_setup
+      mock_factory_girl
+    end
+    
+    teardown do
+      after_teardown
+    end
+
+    context "Complex profiler" do
+      context "Naming" do
+        should "load same named nodes with different aliases" do
+          config = stub('config', :fixtures_path => File.expand_path("../../../support/data/dummy_structure/test", __FILE__) )
+          config.stubs(:profile).returns({
+              "user" => [{
+                  "amount" => "10",
+                  "as" => "witness"
+                },{
+                  "amount" => "10",
+                  "as" => "perpetrator"
+                }]
+            })
+          Cockroach.stubs(:config).returns(config)
+          profiler = Cockroach::FactoryGirl::Profiler.new config
+          Cockroach.stubs(:profiler).returns(profiler)
+
+          profiler.load
+
+          assert_not_nil Cockroach.profiler["witness"]
+          assert_not_nil Cockroach.profiler["perpetrator"]
+        end
+      end
+    end
+
     context "Simple profiler" do
       setup do
-        before_setup
-        mock_factory_girl
         Cockroach.setup do |c|
           c.root = File.expand_path("../../../support/data/dummy_structure", __FILE__)
           c.config_path = "./config/user_only.yml"
         end
-      end
-
-      teardown do
-        after_teardown
       end
 
       should "inherit default config" do
@@ -45,7 +73,7 @@ module Cockroach
             assert_equal @users_node, profiler['person']
           end
         end
-        
+
         should "loading" do
           profiler = Cockroach::FactoryGirl::Profiler.new
 
@@ -77,8 +105,6 @@ module Cockroach
 
     context "Profiling" do
       setup do
-        before_setup
-        mock_factory_girl
         ActiveSupport::Inflector.inflections do |inflect|
           inflect.singular /(ss)$/, '\1'
         end
@@ -88,7 +114,7 @@ module Cockroach
         end
         @profile = Cockroach::FactoryGirl::Profiler.new
       end
-      
+
       should "load without error" do
         ::FactoryGirl.stubs(:factory_by_name).with(any_parameters)
 
