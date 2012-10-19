@@ -14,25 +14,83 @@ module Cockroach
 
     context "Complex profiler" do
       context "Naming" do
-        should "load same named nodes with different aliases" do
-          config = stub('config', :fixtures_path => File.expand_path("../../../support/data/dummy_structure/test", __FILE__) )
-          config.stubs(:profile).returns({
-              "user" => [{
-                  "amount" => "10",
-                  "as" => "witness"
-                },{
-                  "amount" => "10",
-                  "as" => "perpetrator"
-                }]
-            })
-          Cockroach.stubs(:config).returns(config)
-          profiler = Cockroach::FactoryGirl::Profiler.new config
-          Cockroach.stubs(:profiler).returns(profiler)
+        context "No subnode" do
+          setup do
+            config = stub('config', :fixtures_path => File.expand_path("../../../support/data/dummy_structure/test", __FILE__) )
+            config.stubs(:profile).returns({
+                "user" => [{
+                    "amount" => "5",
+                    "as" => "witness"
+                  },{
+                    "amount" => "5",
+                    "as" => "perpetrator"
+                  }]
+              })
+            Cockroach.stubs(:config).returns(config)
+            profiler = Cockroach::FactoryGirl::Profiler.new config
+            Cockroach.stubs(:profiler).returns(profiler)
+          end
 
-          profiler.load
+          should "load same named nodes with different aliases" do
+            Cockroach.profiler.load
 
-          assert_not_nil Cockroach.profiler["witness"]
-          assert_not_nil Cockroach.profiler["perpetrator"]
+            assert_not_nil Cockroach.profiler["witness"]
+            assert_not_nil Cockroach.profiler["perpetrator"]
+          end
+
+          should "load! same named nodes with different aliases" do
+            user_stubs = ((1..10).to_a.collect {|i| stub('user', :id => i) })
+            ::FactoryGirl.expects(:create).with("user").times(10).returns( *user_stubs )
+
+            Cockroach.profiler.load!
+          end
+        end
+      
+        context "Sobnode" do
+          setup do
+            config = stub('config', :fixtures_path => File.expand_path("../../../support/data/dummy_structure/test", __FILE__) )
+            config.stubs(:profile).returns({
+                "user" => [{
+                    "amount" => "3",
+                    "as" => "witness",
+                    "evidence" => {
+                      "amount" => "2"
+                    }
+                  },{
+                    "amount" => "7",
+                    "as" => "perpetrator"
+                  }]
+              })
+            
+            Cockroach.stubs(:config).returns(config)
+            profiler = Cockroach::FactoryGirl::Profiler.new config
+            Cockroach.stubs(:profiler).returns(profiler)
+          end
+
+          should "load same named nodes with different aliases" do
+            ::FactoryGirl.stubs(:factory_by_name).with('evidence').returns(stub('evidence'))
+            Cockroach::FactoryGirl::Node.any_instance.stubs(:allowed_options).returns(['witness'])
+
+            Cockroach.profiler.load
+
+            assert_not_nil Cockroach.profiler["witness"]
+            assert_not_nil Cockroach.profiler["perpetrator"]
+          end
+
+          should "load! same named nodes with different aliases" do
+            user_stubs = ((1..10).to_a.collect {|i| stub('user', :id => i) })
+            evidence_stubs = ((1..10).to_a.collect {|i| stub('evidence', :id => i) })
+
+            ::FactoryGirl.stubs(:factory_by_name).with('evidence').returns(stub('evidence'))
+            Cockroach::FactoryGirl::Node.any_instance.stubs(:allowed_options).returns(['witness'])
+
+            ::FactoryGirl.expects(:create).with("user").times(10).returns( *user_stubs )
+            ::FactoryGirl.expects(:create).with("evidence", "witness" => user_stubs[0]).times(2).returns( *evidence_stubs[0..1] )
+            ::FactoryGirl.expects(:create).with("evidence", "witness" => user_stubs[1]).times(2).returns( *evidence_stubs[2..3] )
+            ::FactoryGirl.expects(:create).with("evidence", "witness" => user_stubs[2]).times(2).returns( *evidence_stubs[4..5] )
+
+            Cockroach.profiler.load!
+          end
         end
       end
     end
