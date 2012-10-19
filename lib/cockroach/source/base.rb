@@ -15,18 +15,23 @@ module Cockroach
         instance
       end
 
+      def association_as_source?
+        @options.include?("association")
+      end
+      alias_method :association?, :association_as_source?
+
+      def association_name
+        @options["association"]
+      end
+
       protected
 
       def get_sample
         raise "Abstract class"
       end
 
-      def association_as_source?
-        @options.include?("association")
-      end
-
       def get_association instance
-        instance.__send__(@options["association"])
+        instance.__send__(association_name)
       end
     end
   end

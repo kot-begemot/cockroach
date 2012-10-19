@@ -50,20 +50,38 @@ HEADER
       amount_column_lenght = pure_space / 5
       node_name_column_lenght = (pure_space - amount_column_lenght) / 2
       source_column_length = pure_space - amount_column_lenght - node_name_column_lenght
-      "* " << node.node_name.rjust(level).ljust(node_name_column_lenght) << " * " <<
-        string_for_source(node.source).ljust(source_column_length) << " * " <<
-        node.generated_amount.to_s.rjust(amount_column_lenght) << " *"
+
+      "* " << 
+        string_for_hierachical_node_name(node.node_name, level).ljust(node_name_column_lenght) <<
+        " * " <<
+        string_for_source(node.source).ljust(source_column_length) <<
+        " * " <<
+        node.generated_amount.to_s.rjust(amount_column_lenght) <<
+        " *"
     end
 
     def table_length
       @table_length ||= self.class.table_length
     end
 
+    def string_for_hierachical_node_name node_name, level
+      if level > 0
+        " "*(level - 1) << "- " << node_name
+      else
+        node_name
+      end
+    end
+
     def string_for_source s
       if s && (source = s.source)
-        source.kind_of?(Cockroach::Base::Node) ?
-          "Node(#{source.node_name})" :
-          "Model(#{source.to_s})"
+        str = if source.kind_of?(Cockroach::Base::Node)
+          "Node(#{source.node_name}"
+        else
+          "Model(#{source.to_s}"
+        end 
+        str <<
+          (s.association_as_source? ? ":#{s.association_name}" : "") <<
+          ")"
       else
         ''
       end
