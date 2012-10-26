@@ -9,6 +9,8 @@ namespace :cockroach do
       end
     end
 
+    abort("Cockroach is missing config. Make sure you defined initializer or provide config file path") unless Cockroach.config
+
     puts "Considering factory location as: #{Cockroach.config.fixtures_path || Cockroach::Config.root}"
 
     Cockroach.profiler.load
